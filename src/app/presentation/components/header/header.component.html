@@ -6,7 +6,7 @@
       <p class="text-sm text-slate-300">Hello, {{ userName }}</p>
       <p class="text-base font-semibold">
         Available balance:
-        {{ availableBalance | currency: 'COP' : 'symbol' : '1.0-0' }}
+        {{ availableBalance() | currency: 'COP' : 'symbol' : '1.0-0' }}
       </p>
     </div>
   </div>

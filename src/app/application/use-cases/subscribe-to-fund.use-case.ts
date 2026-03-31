@@ -10,6 +10,7 @@ import { USER_ACCOUNT_PORT, UserAccountPort } from '../ports/user-account.port';
 
 export interface SubscribeToFundCommand {
   fundId: string;
+  amount: number;
   notificationMethod: NotificationMethod;
 }
 
@@ -32,21 +33,46 @@ export class SubscribeToFundUseCase {
     }
 
     const user = this.userAccountPort.getCurrentUser();
+    const userFundTransactions = this.transactionRecordPort
+      .listByUserId(user.id)
+      .filter((transaction) => transaction.fundId === fund.id);
 
-    if (user.balance < fund.minimumAmount) {
+    const activeSubscriptions = userFundTransactions.reduce((count, transaction) => {
+      if (transaction.type === 'subscription') {
+        return count + 1;
+      }
+
+      if (transaction.type === 'cancellation') {
+        return count - 1;
+      }
+
+      return count;
+    }, 0);
+
+    if (activeSubscriptions > 0) {
+      throw new Error(`You are already subscribed to ${fund.name}.`);
+    }
+
+    if (command.amount < fund.minimumAmount) {
       throw new Error(
-        `You do not have enough balance to subscribe to ${fund.name}. Minimum required: ${fund.minimumAmount}.`
+        `The amount for ${fund.name} must be at least ${fund.minimumAmount}.`
       );
     }
 
-    this.userAccountPort.updateBalance(user.balance - fund.minimumAmount);
+    if (user.balance < command.amount) {
+      throw new Error(
+        `You do not have enough balance to subscribe to ${fund.name} with ${command.amount}.`
+      );
+    }
+
+    this.userAccountPort.updateBalance(user.balance - command.amount);
 
     const transaction: Transaction = {
       id: createTransactionId(),
       userId: user.id,
       fundId: fund.id,
       type: 'subscription',
-      amount: fund.minimumAmount,
+      amount: command.amount,
       createdAt: new Date(),
       notificationMethod: command.notificationMethod,
     };
