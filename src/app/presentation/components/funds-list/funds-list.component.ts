@@ -1,5 +1,5 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component, Inject, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, inject, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { TableModule } from 'primeng/table';
 
 import { SubscribeToFundUseCase } from '../../../application/use-cases/subscribe-to-fund.use-case';
@@ -28,6 +28,10 @@ export class FundsListComponent implements OnChanges {
   readonly hasActiveSubscriptionByFundId: Record<string, boolean> = {};
   feedbackMessage = '';
   hasError = false;
+  private readonly subscribeToFundUseCase: SubscribeToFundUseCase = inject(SubscribeToFundUseCase);
+  private readonly userAccountPort: UserAccountPort = inject(USER_ACCOUNT_PORT);
+  private readonly transactionRecordPort: TransactionRecordPort = inject(TRANSACTION_RECORD_PORT);
+  private readonly userBalanceService: UserBalanceService = inject(UserBalanceService);
 
   @Input() portfolioVersion = 0;
 
@@ -56,13 +60,7 @@ export class FundsListComponent implements OnChanges {
     }
   }
 
-  constructor(
-    private readonly subscribeToFundUseCase: SubscribeToFundUseCase,
-    @Inject(USER_ACCOUNT_PORT) private readonly userAccountPort: UserAccountPort,
-    @Inject(TRANSACTION_RECORD_PORT)
-    private readonly transactionRecordPort: TransactionRecordPort,
-    private readonly userBalanceService: UserBalanceService
-  ) {
+  constructor() {
     this.userBalanceService.refresh();
     this.refreshActiveSubscriptions();
   }

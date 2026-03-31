@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 
 import {
   NotificationMethod,
@@ -16,12 +16,9 @@ export interface SubscribeToFundCommand {
 
 @Injectable({ providedIn: 'root' })
 export class SubscribeToFundUseCase {
-  constructor(
-    @Inject(FUND_QUERY_PORT) private readonly fundQueryPort: FundQueryPort,
-    @Inject(USER_ACCOUNT_PORT) private readonly userAccountPort: UserAccountPort,
-    @Inject(TRANSACTION_RECORD_PORT)
-    private readonly transactionRecordPort: TransactionRecordPort
-  ) {}
+  private readonly fundQueryPort: FundQueryPort = inject(FUND_QUERY_PORT);
+  private readonly userAccountPort: UserAccountPort = inject(USER_ACCOUNT_PORT);
+  private readonly transactionRecordPort: TransactionRecordPort = inject(TRANSACTION_RECORD_PORT);
 
   execute(command: SubscribeToFundCommand): Transaction {
     const fund = this.fundQueryPort
