@@ -11,4 +11,10 @@ export class TransactionRecordInMemoryAdapter implements TransactionRecordPort {
     this.transactions.push(transaction);
     return { ...transaction };
   }
+
+  listByUserId(userId: string): Transaction[] {
+    return this.transactions
+      .filter((transaction) => transaction.userId === userId)
+      .map((transaction) => ({ ...transaction }));
+  }
 }
