@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
 
 import { Transaction } from '../../../domain/entities/transaction.entity';
@@ -17,17 +17,19 @@ import { UserBalanceService } from '../../services/user-balance.service';
   imports: [FundsListComponent, TransactionsTableComponent, Tabs, TabList, Tab, TabPanels, TabPanel],
   templateUrl: './home.page.html',
 })
-export class HomePageComponent {
-  readonly funds: Fund[];
+export class HomePageComponent implements OnInit {
+  funds: Fund[] = [];
   transactions: TransactionRow[] = [];
   activeTab: string | number = 'funds';
   portfolioVersion = 0;
+  private readonly listAvailableFundsUseCase: ListAvailableFundsUseCase =
+    inject(ListAvailableFundsUseCase);
+  private readonly listTransactionHistoryUseCase: ListTransactionHistoryUseCase = inject(
+    ListTransactionHistoryUseCase
+  );
+  private readonly userBalanceService: UserBalanceService = inject(UserBalanceService);
 
-  constructor(
-    private readonly listAvailableFundsUseCase: ListAvailableFundsUseCase,
-    private readonly listTransactionHistoryUseCase: ListTransactionHistoryUseCase,
-    private readonly userBalanceService: UserBalanceService
-  ) {
+  ngOnInit(): void {
     this.funds = this.listAvailableFundsUseCase.execute();
     this.refreshTransactions();
   }

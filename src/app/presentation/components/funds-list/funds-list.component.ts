@@ -1,5 +1,5 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component, inject, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, inject, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { TableModule } from 'primeng/table';
 
 import { SubscribeToFundUseCase } from '../../../application/use-cases/subscribe-to-fund.use-case';
@@ -17,7 +17,7 @@ import { UserBalanceService } from '../../services/user-balance.service';
   imports: [TableModule, CurrencyPipe],
   templateUrl: './funds-list.component.html',
 })
-export class FundsListComponent implements OnChanges {
+export class FundsListComponent implements OnChanges, OnInit {
   private _funds: Fund[] = [];
   readonly notificationMethods: Array<{ value: NotificationMethod; label: string }> = [
     { value: 'email', label: '📧 Email' },
@@ -60,7 +60,7 @@ export class FundsListComponent implements OnChanges {
     }
   }
 
-  constructor() {
+  ngOnInit(): void {
     this.userBalanceService.refresh();
     this.refreshActiveSubscriptions();
   }
