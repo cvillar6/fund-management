@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-
 import { TransactionRecordPort } from '../../application/ports/transaction-record.port';
 import { Transaction } from '../../domain/entities/transaction.entity';
 
@@ -15,6 +14,5 @@ export class TransactionRecordInMemoryAdapter implements TransactionRecordPort {
   listByUserId(userId: string): Transaction[] {
     return this.transactions
       .filter((transaction) => transaction.userId === userId)
-      .map((transaction) => ({ ...transaction }));
   }
 }

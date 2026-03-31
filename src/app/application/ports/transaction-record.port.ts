@@ -1,5 +1,4 @@
 import { InjectionToken } from '@angular/core';
-
 import { Transaction } from '../../domain/entities/transaction.entity';
 
 export interface TransactionRecordPort {

@@ -1,5 +1,4 @@
 import { InjectionToken } from '@angular/core';
-
 import { Fund } from '../../domain/entities/fund.entity';
 
 export interface FundQueryPort {

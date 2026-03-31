@@ -1,15 +1,14 @@
 import { CurrencyPipe } from '@angular/common';
 import { Component, inject, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { TableModule } from 'primeng/table';
-
-import { SubscribeToFundUseCase } from '../../../application/use-cases/subscribe-to-fund.use-case';
-import { Fund } from '../../../domain/entities/fund.entity';
-import { NotificationMethod } from '../../../domain/entities/transaction.entity';
-import { USER_ACCOUNT_PORT, UserAccountPort } from '../../../application/ports/user-account.port';
 import {
   TRANSACTION_RECORD_PORT,
   TransactionRecordPort,
 } from '../../../application/ports/transaction-record.port';
+import { USER_ACCOUNT_PORT, UserAccountPort } from '../../../application/ports/user-account.port';
+import { SubscribeToFundUseCase } from '../../../application/use-cases/subscribe-to-fund.use-case';
+import { Fund } from '../../../domain/entities/fund.entity';
+import { NotificationMethod } from '../../../domain/entities/transaction.entity';
 import { UserBalanceService } from '../../services/user-balance.service';
 
 @Component({

@@ -1,5 +1,4 @@
 import { inject, Injectable } from '@angular/core';
-
 import { Transaction } from '../../domain/entities/transaction.entity';
 import { FUND_QUERY_PORT, FundQueryPort } from '../ports/fund-query.port';
 import { TRANSACTION_RECORD_PORT, TransactionRecordPort } from '../ports/transaction-record.port';

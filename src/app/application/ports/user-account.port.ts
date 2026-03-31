@@ -1,5 +1,4 @@
 import { InjectionToken } from '@angular/core';
-
 import { User } from '../../domain/entities/user.entity';
 
 export interface UserAccountPort {
