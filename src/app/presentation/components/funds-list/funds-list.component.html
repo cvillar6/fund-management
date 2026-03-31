@@ -1,27 +1,27 @@
 <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
-  <p-table [value]="funds" class="min-w-[50rem]" stripedRows>
-  <ng-template pTemplate="header">
-    <tr>
-      <th class="bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-700">ID</th>
-      <th class="bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-700">Name</th>
-      <th class="bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-700">
-        Minimum Amount
-      </th>
-      <th class="bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-700">
-        Category
-      </th>
-    </tr>
-  </ng-template>
+  <p-table [value]="funds" class="min-w-200" stripedRows>
+    <ng-template pTemplate="header">
+      <tr>
+        <th class="bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-700">ID</th>
+        <th class="bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-700">Name</th>
+        <th class="bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-700">
+          Minimum Amount
+        </th>
+        <th class="bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-700">
+          Category
+        </th>
+      </tr>
+    </ng-template>
 
-  <ng-template pTemplate="body" let-fund>
-    <tr class="border-b border-slate-100">
-      <td class="px-4 py-3 text-sm text-slate-800">{{ fund.id }}</td>
-      <td class="px-4 py-3 text-sm text-slate-800">{{ fund.name }}</td>
-      <td class="px-4 py-3 text-sm text-slate-800">
-        {{ fund.minimumAmount | currency: 'COP' : 'symbol' : '1.0-0' }}
-      </td>
-      <td class="px-4 py-3 text-sm text-slate-800">{{ fund.category }}</td>
-    </tr>
-  </ng-template>
+    <ng-template pTemplate="body" let-fund>
+      <tr class="border-b border-slate-100">
+        <td class="px-4 py-3 text-sm text-slate-800">{{ fund.id }}</td>
+        <td class="px-4 py-3 text-sm text-slate-800">{{ fund.name }}</td>
+        <td class="px-4 py-3 text-sm text-slate-800">
+          {{ fund.minimumAmount | currency: 'COP' : 'symbol' : '1.0-0' }}
+        </td>
+        <td class="px-4 py-3 text-sm text-slate-800">{{ fund.category }}</td>
+      </tr>
+    </ng-template>
   </p-table>
 </div>
