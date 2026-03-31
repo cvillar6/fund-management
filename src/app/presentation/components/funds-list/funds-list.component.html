@@ -1,0 +1,80 @@
+<div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+  <div class="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+    <p class="text-sm text-slate-600">Choose a notification method and subscribe.</p>
+    <p class="text-sm font-semibold text-slate-800">
+      Available Balance: {{ currentBalance | currency: 'COP' : 'symbol' : '1.0-0' }}
+    </p>
+  </div>
+
+  <p-table [value]="funds()" class="min-w-200" stripedRows>
+    <ng-template pTemplate="header">
+      <tr>
+        <th class="bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-700">ID</th>
+        <th class="bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-700">Name</th>
+        <th class="bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-700">
+          Minimum Amount
+        </th>
+        <th class="bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-700">
+          Category
+        </th>
+        <th class="bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-700">
+          Notification
+        </th>
+        <th class="bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-700">Amount</th>
+        <th class="bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-700">Action</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-fund>
+      <tr class="border-b border-slate-100">
+        <td class="px-4 py-3 text-sm text-slate-800">{{ fund.id }}</td>
+        <td class="px-4 py-3 text-sm text-slate-800">{{ fund.name }}</td>
+        <td class="px-4 py-3 text-sm text-slate-800">
+          {{ fund.minimumAmount | currency: 'COP' : 'symbol' : '1.0-0' }}
+        </td>
+        <td class="px-4 py-3 text-sm text-slate-800">{{ fund.category }}</td>
+        <td class="px-4 py-3 text-sm text-slate-800">
+          <select
+            class="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-slate-500 focus:outline-none disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400"
+            [value]="selectedNotificationMethodByFundId[fund.id]"
+            [disabled]="hasActiveSubscription(fund.id)"
+            (change)="onNotificationMethodChange(fund.id, $any($event.target).value)"
+          >
+            @for (option of notificationMethods; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </td>
+        <td class="px-4 py-3 text-sm text-slate-800">
+          <input
+            type="number"
+            class="w-32 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-slate-500 focus:outline-none disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400"
+            [value]="selectedAmountByFundId[fund.id]"
+            [min]="fund.minimumAmount"
+            step="1000"
+            [disabled]="hasActiveSubscription(fund.id)"
+            (input)="onAmountChange(fund, $any($event.target).value)"
+          />
+        </td>
+        <td class="px-4 py-3 text-sm text-slate-800">
+          <button
+            type="button"
+            class="cursor-pointer rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500"
+            [disabled]="!canSubscribe(fund)"
+            (click)="subscribeToFund(fund)"
+          >
+            {{ hasActiveSubscription(fund.id) ? 'Subscribed' : 'Subscribe' }}
+          </button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  @if (feedbackMessage) {
+    <div class="border-t border-slate-200 px-4 py-3">
+      <p class="text-sm" [class]="hasError ? 'text-red-600' : 'text-emerald-700'">
+        {{ feedbackMessage }}
+      </p>
+    </div>
+  }
+</div>

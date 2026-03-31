@@ -1,0 +1,18 @@
+<section class="mx-auto w-full max-w-6xl px-6 py-6">
+  <p-tabs [value]="activeTab" (valueChange)="onTabChange($event)" class="block">
+    <p-tablist>
+      <p-tab value="funds">Available Funds</p-tab>
+      <p-tab value="history">Transactions History</p-tab>
+    </p-tablist>
+    <p-tabpanels>
+      <p-tabpanel value="funds">
+        <h1 class="mb-4 mt-4 text-2xl font-semibold text-slate-900">Available Funds</h1>
+        <app-funds-list [funds]="funds" />
+      </p-tabpanel>
+      <p-tabpanel value="history">
+        <h1 class="mb-4 mt-4 text-2xl font-semibold text-slate-900">Transactions History</h1>
+        <app-transactions-table [transactions]="transactions" />
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</section>

@@ -1,0 +1,51 @@
+<div class="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+  <p-table [value]="transactions()" class="min-w-200" stripedRows>
+    <ng-template pTemplate="header">
+      <tr>
+        <th class="bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-700">Date</th>
+        <th class="bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-700">Fund</th>
+        <th class="bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-700">Type</th>
+        <th class="bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-700">Amount</th>
+        <th class="bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-700">
+          Notification
+        </th>
+        <th class="bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-700">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-transaction>
+      <tr class="border-b border-slate-100">
+        <td class="px-4 py-3 text-sm text-slate-800">
+          {{ transaction.createdAt | date: 'yyyy-MM-dd HH:mm' }}
+        </td>
+        <td class="px-4 py-3 text-sm text-slate-800">{{ transaction.fundName }}</td>
+        <td class="px-4 py-3 text-sm text-slate-800">{{ transaction.type | titlecase }}</td>
+        <td class="px-4 py-3 text-sm text-slate-800">
+          {{ transaction.amount | currency: 'COP' : 'symbol' : '1.0-0' }}
+        </td>
+        <td class="px-4 py-3 text-sm text-slate-800">{{ transaction.notificationMethod }}</td>
+        <td class="px-4 py-3 text-sm text-slate-800">
+          @if (transaction.canCancel) {
+            <button
+              type="button"
+              class="cursor-pointer rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-800 transition hover:bg-red-100"
+              (click)="cancelSubscription(transaction)"
+            >
+              Cancel subscription
+            </button>
+          } @else {
+            <span class="text-slate-400">—</span>
+          }
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  @if (feedbackMessage) {
+    <div class="border-t border-slate-200 px-4 py-3">
+      <p class="text-sm" [class]="hasError ? 'text-red-600' : 'text-emerald-700'">
+        {{ feedbackMessage }}
+      </p>
+    </div>
+  }
+</div>
