@@ -17,20 +17,24 @@ import { UserBalanceService } from '../../services/user-balance.service';
   templateUrl: './funds-list.component.html',
 })
 export class FundsListComponent implements OnChanges, OnInit {
-  private _funds: Fund[] = [];
-  readonly notificationMethods: Array<{ value: NotificationMethod; label: string }> = [
-    { value: 'email', label: '📧 Email' },
-    { value: 'sms', label: '📱 SMS' },
-  ];
-  readonly selectedNotificationMethodByFundId: Record<string, NotificationMethod> = {};
-  readonly selectedAmountByFundId: Record<string, number> = {};
-  readonly hasActiveSubscriptionByFundId: Record<string, boolean> = {};
-  feedbackMessage = '';
-  hasError = false;
   private readonly subscribeToFundUseCase: SubscribeToFundUseCase = inject(SubscribeToFundUseCase);
   private readonly userAccountPort: UserAccountPort = inject(USER_ACCOUNT_PORT);
   private readonly transactionRecordPort: TransactionRecordPort = inject(TRANSACTION_RECORD_PORT);
   private readonly userBalanceService: UserBalanceService = inject(UserBalanceService);
+
+  private _funds: Fund[] = [];
+
+  readonly notificationMethods: Array<{ value: NotificationMethod; label: string }> = [
+    { value: 'email', label: '📧 Email' },
+    { value: 'sms', label: '📱 SMS' },
+  ];
+
+  readonly selectedNotificationMethodByFundId: Record<string, NotificationMethod> = {};
+  readonly selectedAmountByFundId: Record<string, number> = {};
+  readonly hasActiveSubscriptionByFundId: Record<string, boolean> = {};
+
+  feedbackMessage = '';
+  hasError = false;
 
   @Input() portfolioVersion = 0;
 

@@ -1,5 +1,5 @@
 import { CurrencyPipe, DatePipe, TitleCasePipe } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { TableModule } from 'primeng/table';
 import { CancelFundSubscriptionUseCase } from '../../../application/use-cases/cancel-fund-subscription.use-case';
 import { UserBalanceService } from '../../services/user-balance.service';
@@ -27,10 +27,8 @@ export class TransactionsTableComponent {
   feedbackMessage = '';
   hasError = false;
 
-  constructor(
-    private readonly cancelFundSubscriptionUseCase: CancelFundSubscriptionUseCase,
-    private readonly userBalanceService: UserBalanceService
-  ) { }
+  private readonly cancelFundSubscriptionUseCase: CancelFundSubscriptionUseCase = inject(CancelFundSubscriptionUseCase);
+  private readonly userBalanceService: UserBalanceService = inject(UserBalanceService);
 
   cancelSubscription(row: TransactionRow): void {
     if (!row.canCancel) {
