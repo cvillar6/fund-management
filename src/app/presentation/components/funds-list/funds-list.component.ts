@@ -24,6 +24,7 @@ export class FundsListComponent implements OnInit {
   private readonly transactionRecordPort: TransactionRecordPort = inject(TRANSACTION_RECORD_PORT);
   private readonly portfolioEventsService: PortfolioEventsService = inject(PortfolioEventsService);
   private readonly userBalanceService: UserBalanceService = inject(UserBalanceService);
+
   readonly funds = input.required<Fund[]>();
 
   readonly notificationMethods: Array<{ value: NotificationMethod; label: string }> = [
