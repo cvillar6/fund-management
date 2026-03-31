@@ -7,11 +7,11 @@
     <p-tabpanels>
       <p-tabpanel value="funds">
         <h1 class="mb-4 mt-4 text-2xl font-semibold text-slate-900">Available Funds</h1>
-        <app-funds-list [funds]="funds" [portfolioVersion]="portfolioVersion" />
+        <app-funds-list [funds]="funds" />
       </p-tabpanel>
       <p-tabpanel value="history">
         <h1 class="mb-4 mt-4 text-2xl font-semibold text-slate-900">Transactions History</h1>
-        <app-transactions-table [transactions]="transactions" (portfolioChanged)="onPortfolioChanged()" />
+        <app-transactions-table [transactions]="transactions" />
       </p-tabpanel>
     </p-tabpanels>
   </p-tabs>

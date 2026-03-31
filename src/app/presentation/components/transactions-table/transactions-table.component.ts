@@ -1,7 +1,8 @@
 import { CurrencyPipe, DatePipe, TitleCasePipe } from '@angular/common';
-import { Component, inject, input, output } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { TableModule } from 'primeng/table';
 import { CancelFundSubscriptionUseCase } from '../../../application/use-cases/cancel-fund-subscription.use-case';
+import { PortfolioEventsService } from '../../services/portfolio-events.service';
 import { UserBalanceService } from '../../services/user-balance.service';
 
 export interface TransactionRow {
@@ -22,12 +23,12 @@ export interface TransactionRow {
 })
 export class TransactionsTableComponent {
   readonly transactions = input.required<TransactionRow[]>();
-  readonly portfolioChanged = output<void>();
 
   feedbackMessage = '';
   hasError = false;
 
   private readonly cancelFundSubscriptionUseCase: CancelFundSubscriptionUseCase = inject(CancelFundSubscriptionUseCase);
+  private readonly portfolioEventsService: PortfolioEventsService = inject(PortfolioEventsService);
   private readonly userBalanceService: UserBalanceService = inject(UserBalanceService);
 
   cancelSubscription(row: TransactionRow): void {
@@ -41,7 +42,7 @@ export class TransactionsTableComponent {
     try {
       this.cancelFundSubscriptionUseCase.execute({ fundId: row.fundId });
       this.userBalanceService.refresh();
-      this.portfolioChanged.emit();
+      this.portfolioEventsService.notifyChanged();
       this.feedbackMessage = `Subscription to ${row.fundName} was cancelled.`;
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Could not cancel subscription.';

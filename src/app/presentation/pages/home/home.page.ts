@@ -1,15 +1,15 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, effect, inject, OnInit } from '@angular/core';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
-
-import { Transaction } from '../../../domain/entities/transaction.entity';
-import { Fund } from '../../../domain/entities/fund.entity';
 import { ListAvailableFundsUseCase } from '../../../application/use-cases/list-available-funds.use-case';
 import { ListTransactionHistoryUseCase } from '../../../application/use-cases/list-transaction-history.use-case';
+import { Fund } from '../../../domain/entities/fund.entity';
+import { Transaction } from '../../../domain/entities/transaction.entity';
 import { FundsListComponent } from '../../components/funds-list/funds-list.component';
 import {
-  TransactionsTableComponent,
   TransactionRow,
+  TransactionsTableComponent,
 } from '../../components/transactions-table/transactions-table.component';
+import { PortfolioEventsService } from '../../services/portfolio-events.service';
 import { UserBalanceService } from '../../services/user-balance.service';
 
 @Component({
@@ -21,13 +21,13 @@ export class HomePageComponent implements OnInit {
   funds: Fund[] = [];
   transactions: TransactionRow[] = [];
   activeTab: string | number = 'funds';
-  portfolioVersion = 0;
   private readonly listAvailableFundsUseCase: ListAvailableFundsUseCase =
     inject(ListAvailableFundsUseCase);
   private readonly listTransactionHistoryUseCase: ListTransactionHistoryUseCase = inject(
     ListTransactionHistoryUseCase
   );
   private readonly userBalanceService: UserBalanceService = inject(UserBalanceService);
+  private readonly portfolioEventsService: PortfolioEventsService = inject(PortfolioEventsService);
 
   ngOnInit(): void {
     this.funds = this.listAvailableFundsUseCase.execute();
@@ -42,12 +42,6 @@ export class HomePageComponent implements OnInit {
     if (value === 'history') {
       this.refreshTransactions();
     }
-  }
-
-  onPortfolioChanged(): void {
-    this.userBalanceService.refresh();
-    this.refreshTransactions();
-    this.portfolioVersion++;
   }
 
   private refreshTransactions(): void {
@@ -74,6 +68,12 @@ export class HomePageComponent implements OnInit {
       };
     });
   }
+
+  private readonly portfolioEventsEffect = effect(() => {
+    this.portfolioEventsService.version();
+    this.userBalanceService.refresh();
+    this.refreshTransactions();
+  });
 }
 
 function buildActiveSubscriptionIdByFund(transactions: Transaction[]): Map<string, string | null> {

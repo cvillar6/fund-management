@@ -10,6 +10,7 @@ import { USER_ACCOUNT_PORT, UserAccountPort } from '../../../application/ports/u
 import { SubscribeToFundUseCase } from '../../../application/use-cases/subscribe-to-fund.use-case';
 import { Fund } from '../../../domain/entities/fund.entity';
 import { NotificationMethod } from '../../../domain/entities/transaction.entity';
+import { PortfolioEventsService } from '../../services/portfolio-events.service';
 import { UserBalanceService } from '../../services/user-balance.service';
 
 @Component({
@@ -21,10 +22,8 @@ export class FundsListComponent implements OnInit {
   private readonly subscribeToFundUseCase: SubscribeToFundUseCase = inject(SubscribeToFundUseCase);
   private readonly userAccountPort: UserAccountPort = inject(USER_ACCOUNT_PORT);
   private readonly transactionRecordPort: TransactionRecordPort = inject(TRANSACTION_RECORD_PORT);
+  private readonly portfolioEventsService: PortfolioEventsService = inject(PortfolioEventsService);
   private readonly userBalanceService: UserBalanceService = inject(UserBalanceService);
-  private hasHandledInitialPortfolioVersion = false;
-
-  readonly portfolioVersion = input(0);
   readonly funds = input.required<Fund[]>();
 
   readonly notificationMethods: Array<{ value: NotificationMethod; label: string }> = [
@@ -59,14 +58,8 @@ export class FundsListComponent implements OnInit {
     this.refreshActiveSubscriptions();
   });
 
-  private readonly portfolioVersionEffect = effect(() => {
-    this.portfolioVersion();
-
-    if (!this.hasHandledInitialPortfolioVersion) {
-      this.hasHandledInitialPortfolioVersion = true;
-      return;
-    }
-
+  private readonly portfolioEventsEffect = effect(() => {
+    this.portfolioEventsService.version();
     this.userBalanceService.refresh();
     this.refreshActiveSubscriptions();
   });
@@ -112,6 +105,7 @@ export class FundsListComponent implements OnInit {
       });
       this.userBalanceService.refresh();
       this.refreshActiveSubscriptions();
+      this.portfolioEventsService.notifyChanged();
       this.feedbackMessage = `You subscribed to ${fund.name} via ${notificationMethod.toUpperCase()}.`;
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Could not complete subscription.';
