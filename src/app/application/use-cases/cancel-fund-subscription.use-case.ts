@@ -32,30 +32,20 @@ export class CancelFundSubscriptionUseCase {
       .listByUserId(user.id)
       .filter((transaction) => transaction.fundId === fund.id);
 
-    const activeSubscriptions = userFundTransactions.reduce((count, transaction) => {
-      if (transaction.type === 'subscription') {
-        return count + 1;
-      }
+    const { activeDepth, refundableAmount } = computeActiveSubscriptionState(userFundTransactions);
 
-      if (transaction.type === 'cancellation') {
-        return count - 1;
-      }
-
-      return count;
-    }, 0);
-
-    if (activeSubscriptions <= 0) {
+    if (activeDepth <= 0 || refundableAmount <= 0) {
       throw new Error(`You are not subscribed to ${fund.name}, so it cannot be cancelled.`);
     }
 
-    this.userAccountPort.updateBalance(user.balance + fund.minimumAmount);
+    this.userAccountPort.updateBalance(user.balance + refundableAmount);
 
     const transaction: Transaction = {
       id: createTransactionId(),
       userId: user.id,
       fundId: fund.id,
       type: 'cancellation',
-      amount: fund.minimumAmount,
+      amount: refundableAmount,
       createdAt: new Date(),
     };
 
@@ -69,4 +59,29 @@ function createTransactionId(): string {
   }
 
   return `tx-${Date.now()}`;
+}
+
+function computeActiveSubscriptionState(transactions: Transaction[]): {
+  activeDepth: number;
+  refundableAmount: number;
+} {
+  const sorted = [...transactions].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+  let depth = 0;
+  let refundableAmount = 0;
+
+  for (const transaction of sorted) {
+    if (transaction.type === 'subscription') {
+      depth++;
+      if (depth === 1) {
+        refundableAmount = transaction.amount;
+      }
+    } else if (transaction.type === 'cancellation') {
+      depth--;
+      if (depth === 0) {
+        refundableAmount = 0;
+      }
+    }
+  }
+
+  return { activeDepth: depth, refundableAmount };
 }
