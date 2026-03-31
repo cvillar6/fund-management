@@ -1,5 +1,5 @@
 import { CurrencyPipe, DatePipe, TitleCasePipe } from '@angular/common';
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { TableModule } from 'primeng/table';
 import { CancelFundSubscriptionUseCase } from '../../../application/use-cases/cancel-fund-subscription.use-case';
 import { UserBalanceService } from '../../services/user-balance.service';
@@ -21,8 +21,8 @@ export interface TransactionRow {
   templateUrl: './transactions-table.component.html',
 })
 export class TransactionsTableComponent {
-  @Input({ required: true }) transactions: TransactionRow[] = [];
-  @Output() portfolioChanged = new EventEmitter<void>();
+  readonly transactions = input.required<TransactionRow[]>();
+  readonly portfolioChanged = output<void>();
 
   feedbackMessage = '';
   hasError = false;

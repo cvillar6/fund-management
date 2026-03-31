@@ -1,6 +1,7 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component, inject, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, effect, inject, input, OnInit } from '@angular/core';
 import { TableModule } from 'primeng/table';
+
 import {
   TRANSACTION_RECORD_PORT,
   TransactionRecordPort,
@@ -16,13 +17,15 @@ import { UserBalanceService } from '../../services/user-balance.service';
   imports: [TableModule, CurrencyPipe],
   templateUrl: './funds-list.component.html',
 })
-export class FundsListComponent implements OnChanges, OnInit {
+export class FundsListComponent implements OnInit {
   private readonly subscribeToFundUseCase: SubscribeToFundUseCase = inject(SubscribeToFundUseCase);
   private readonly userAccountPort: UserAccountPort = inject(USER_ACCOUNT_PORT);
   private readonly transactionRecordPort: TransactionRecordPort = inject(TRANSACTION_RECORD_PORT);
   private readonly userBalanceService: UserBalanceService = inject(UserBalanceService);
+  private hasHandledInitialPortfolioVersion = false;
 
-  private _funds: Fund[] = [];
+  readonly portfolioVersion = input(0);
+  readonly funds = input.required<Fund[]>();
 
   readonly notificationMethods: Array<{ value: NotificationMethod; label: string }> = [
     { value: 'email', label: '📧 Email' },
@@ -36,37 +39,37 @@ export class FundsListComponent implements OnChanges, OnInit {
   feedbackMessage = '';
   hasError = false;
 
-  @Input() portfolioVersion = 0;
-
-  @Input({ required: true })
-  set funds(value: Fund[]) {
-    this._funds = value;
-    for (const fund of value) {
-      this.selectedNotificationMethodByFundId[fund.id] ??= 'email';
-      this.selectedAmountByFundId[fund.id] ??= fund.minimumAmount;
-    }
-    this.refreshActiveSubscriptions();
-  }
-
-  get funds(): Fund[] {
-    return this._funds;
-  }
-
   get currentBalance(): number {
     return this.userBalanceService.availableBalance();
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['portfolioVersion'] && !changes['portfolioVersion'].firstChange) {
-      this.userBalanceService.refresh();
-      this.refreshActiveSubscriptions();
-    }
   }
 
   ngOnInit(): void {
     this.userBalanceService.refresh();
     this.refreshActiveSubscriptions();
   }
+
+  private readonly fundsInputEffect = effect(() => {
+    const currentFunds = this.funds();
+
+    for (const fund of currentFunds) {
+      this.selectedNotificationMethodByFundId[fund.id] ??= 'email';
+      this.selectedAmountByFundId[fund.id] ??= fund.minimumAmount;
+    }
+
+    this.refreshActiveSubscriptions();
+  });
+
+  private readonly portfolioVersionEffect = effect(() => {
+    this.portfolioVersion();
+
+    if (!this.hasHandledInitialPortfolioVersion) {
+      this.hasHandledInitialPortfolioVersion = true;
+      return;
+    }
+
+    this.userBalanceService.refresh();
+    this.refreshActiveSubscriptions();
+  });
 
   canSubscribe(fund: Fund): boolean {
     const amount = this.selectedAmountByFundId[fund.id];
@@ -121,7 +124,7 @@ export class FundsListComponent implements OnChanges, OnInit {
     const user = this.userAccountPort.getCurrentUser();
     const transactions = this.transactionRecordPort.listByUserId(user.id);
 
-    for (const fund of this._funds) {
+    for (const fund of this.funds()) {
       const activeSubscriptions = transactions
         .filter((transaction) => transaction.fundId === fund.id)
         .reduce((count, transaction) => {
